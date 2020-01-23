@@ -52,7 +52,7 @@ export default {
   methods: {
     resetLogin() {
       // console.log(this)
-      this.$refs.loginFrom_ref.resetFields();
+      this.$refs.loginFrom_ref.resetFields();//对整个表单进行重置并移除校验结果
     },
 
     login() {
