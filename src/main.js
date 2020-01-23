@@ -10,6 +10,13 @@ import "./assets/font_389se3aq2p6/iconfont.css"
 import axios from 'axios'
 // 设置公用的请求头
 axios.defaults.baseURL = 'https://www.liulongbin.top:8888/api/private/v1/'
+    // 请求拦截器
+axios.interceptors.request.use(config => {
+        // console.log(config)
+        // 为所有的请求头添加验证字段
+        config.headers.Authorization = window.sessionStorage.getItem('token')
+        return config
+    })
     // 将axios注册给vue全局
 Vue.prototype.$http = axios
 
