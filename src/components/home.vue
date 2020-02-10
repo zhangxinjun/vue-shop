@@ -11,22 +11,26 @@
       <el-aside :width="isCollapse?'64px':'200px'">
         <div class="tog-button" @click="toggleCollaps">|||</div>
         <el-col>
-          <el-menu 
-          background-color="#364136" 
-          text-color="#fff" 
-          active-text-color="#409bff"
-          :collapse='isCollapse'
-          :collapse-transition='false'
-          unique-opened>
-            <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
+          <el-menu
+            background-color="#364136"
+            text-color="#fff"
+            active-text-color="#409bff"
+            :collapse="isCollapse"
+            :collapse-transition="false"
+            unique-opened
+            :router="true"
+            :default-active="activePath"
+          >
+            <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id" >
               <template slot="title">
                 <i :class="iconObj[item.id]"></i>
                 <span>{{item.authName}}</span>
               </template>
               <el-menu-item
-                :index="subItem.id + ''"
+                :index="'/'+subItem.path "
                 v-for="subItem in item.children"
                 :key="subItem.id"
+                @click="saveActive('/'+subItem.path)"
               >
                 <template slot="title">
                   <i class="el-icon-menu"></i>
@@ -37,7 +41,9 @@
           </el-menu>
         </el-col>
       </el-aside>
-      <el-main>Main</el-main>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -46,15 +52,17 @@
 export default {
   data() {
     return {
-      menuList: [] ,//左侧菜单列表
-      iconObj:{
-        '125':'iconfont icon-yonghu',
-        '103':'iconfont icon-lifangtilitiduomiantifangkuai',
-        '101':'iconfont icon-shangpin',
-        '102':'iconfont icon-icon--copy',
-        '145':'iconfont icon-shuju'
+      menuList: [], //左侧菜单列表
+      iconObj: {
+        "125": "iconfont icon-yonghu",
+        "103": "iconfont icon-lifangtilitiduomiantifangkuai",
+        "101": "iconfont icon-shangpin",
+        "102": "iconfont icon-icon--copy",
+        "145": "iconfont icon-shuju"
       },
-      isCollapse:false
+      //是否折叠
+      isCollapse: false,
+      activePath:''
     };
   },
   methods: {
@@ -72,12 +80,18 @@ export default {
         }
       });
     },
-    toggleCollaps(){
-      this.isCollapse= !this.isCollapse
+    toggleCollaps() {
+      this.isCollapse = !this.isCollapse;
+    },
+    saveActive(activePath){
+      // 保存二级菜单的激活状态
+      window.sessionStorage.setItem('activePath',activePath)
+      this.activePath=activePath
     }
   },
   created() {
     this.getMenuList(); //获取左侧菜单列表
+    this.activePath=window.sessionStorage.getItem('activePath')//获取当前激活的菜单的path
   }
 };
 </script>
@@ -86,7 +100,7 @@ export default {
 .home_container {
   height: 100%;
 }
-.iconfont{
+.iconfont {
   margin-right: 10px;
 }
 .el-header {
@@ -108,20 +122,20 @@ export default {
 }
 .el-aside {
   background: #364136;
-  .el-menu{
-    border: none
+  .el-menu {
+    border: none;
   }
 }
 .el-main {
   background: #9fad9f;
 }
-.tog-button{
+.tog-button {
   background: #606960;
   font-size: 10px;
   color: #fff;
   line-height: 24px;
   text-align: center;
   cursor: pointer;
-  letter-spacing: .2rem;
+  letter-spacing: 0.2rem;
 }
 </style>
