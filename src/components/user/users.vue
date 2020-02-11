@@ -18,7 +18,7 @@
                  </el-input>
             </el-col>
             <el-col :span="6">
-                <el-button type='primary'>添加用户</el-button>
+                <el-button type='primary' @click="dialogVisible = true">添加用户</el-button>
             </el-col>
             
         </el-row>  
@@ -63,12 +63,58 @@
         :total="total">
         </el-pagination> 
     </el-card>
+    <!-- 弹出框 -->
+    <el-dialog
+    title="添加用户"
+    :visible.sync="dialogVisible"
+    width="50%"
+    
+    @close='addUserClose'>
+        <el-form :model="ruleForm" :rules="addUserRules" ref="ruleForm" label-width="70px" class="demo-ruleForm">
+            <el-form-item label="用户名" prop="name">
+                <el-input v-model='ruleForm.name'></el-input>
+            </el-form-item>
+            <el-form-item label="密码"  prop="password">
+                <el-input v-model='ruleForm.password' type="password"></el-input>
+              
+            </el-form-item>
+             <el-form-item label="邮箱" prop="email">
+                <el-input v-model='ruleForm.email'></el-input>
+              
+            </el-form-item>
+             <el-form-item label="手机号" prop="mobile">
+                <el-input v-model='ruleForm.mobile'></el-input>
+              
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="addUser">确 定</el-button>
+        </span>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
 export default {
     data(){
+        // 邮箱的自定义验证
+         var checkEmail=(rule,value,callback )=>{
+                const regEmail= /^[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*\.[a-z]{2,}$/
+                if(regEmail.test(value)){
+                  return  callback()//验证通过直接return
+                }
+                 callback(new Error('请输入合法的邮箱'))//验证没有通过，提示的信息
+            };
+            // 手机号的自定义校验
+            var checkCall=(rule,value,callback)=>{
+                const regCall=/^1[3456789]\d{9}$/
+                if(regCall.test(value)){
+                    return callback()
+                }
+                callback(new Error('请输入合法的手机号'))
+            };
         return{
             //请求时传递的参数
             queryInfo:{
@@ -80,7 +126,38 @@ export default {
                 pagesize:2
             },
             userList:[],
-            total:0
+            total:0,
+           
+            //控制弹出框的出现隐藏
+            dialogVisible:false,
+            // 表单验证规则
+            addUserRules:{
+                 name: [
+                    { required: true, message: '请输入用户名', trigger: 'blur' },
+                    { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+                ],
+                password:[
+                    {required: true, message: '请输入密码', trigger: 'blur' },
+                    { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
+
+                ],
+                email:[
+                    {required: true, message: '请输入邮箱', trigger: 'blur' },
+                    {validator:checkEmail,trigger: 'blur'}
+                ],
+                mobile:[
+                     {required: true, message: '请输入电话号码', trigger: 'blur' },
+                    {validator:checkCall,trigger: 'blur'}
+
+                ]
+            },
+            //输入框的双向绑定对象
+             ruleForm: {
+                name: '',
+                password: '',
+                email:'',
+                mobile:''
+            },
         }
     },
     created(){
@@ -125,8 +202,42 @@ export default {
                 }
                 this.$message.success('状态修改成功')
             })
-        }
-       
+        },
+        // 弹出框的关闭事件
+        addUserClose(){
+            // 弹出框关闭的时候重置表单
+            this.$refs.ruleForm.resetFields()
+        },
+        // 点击确定按钮时添加用户
+       addUser(){
+        //    首先对表单进行预先验证，验证成功后发起请求
+            this.$refs.ruleForm.validate(valida => {
+            // console.log(valida)
+            if(!valida){
+                return 
+            }
+            this.$http.post('users',{
+                username:'this.ruleForm.name',
+                password:'this.ruleForm.password',
+                email:'this.ruleForm.email',
+                mobile:'this.ruleForm.mobile'
+            }).then(res =>{
+                console.log(res.data)
+                console.log(this.ruleForm)
+                if(res.data.meta.status==201){
+                    this.$message.success( '恭喜你，添加用户成功' )
+                    this.dialogVisible=false
+                    this.getUserList()
+                    
+                }else{
+                   this.$message.error('添加用户失败');
+
+                }
+
+            })
+
+            })
+       }
     }
 }
 </script>
