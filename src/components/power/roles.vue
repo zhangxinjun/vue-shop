@@ -77,10 +77,10 @@
     <!-- 分配权限的弹窗 -->
     <el-dialog title="提示" :visible.sync="dialogVisible" width="50%" >
       <!-- 树形控件 -->
-      <el-tree :data="rightsList" :props="treeProps" show-checkbox default-expand-all node-key="id" :default-checked-keys=defaultKeys ></el-tree>
+      <el-tree :data="rightsList" :props="treeProps" show-checkbox default-expand-all node-key="id" :default-checked-keys=defaultKeys ref='treeRef'></el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="setDialogRights">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -102,6 +102,8 @@ export default {
       },
       // 默认选中的key的id的数组
       defaultKeys:[],
+      // 当前角色的id
+      roleId:''
     };
   },
   created() {
@@ -148,6 +150,8 @@ export default {
     },
     // 点击分配权限按钮的事件
     setRoles(node){
+      // 保存当前角色的id
+      this.roleId=node.id
       // 点击按钮首先获取所有权限 的树状列表
       this.$http.get('rights/tree').then(res => {
         // console.log(res.data)
@@ -171,6 +175,24 @@ export default {
       // 不是第三级权限，通过递归的方式得到第三级权限
       node.children.forEach(item => {
         this.getLefKeys(item,arr)
+      })
+    },
+    // 分配权限的弹窗的点击确定按钮的事件
+    setDialogRights(){
+      // 把所有全选以及半选中的节点通过解构赋值放到一个数组中，等下调用接口的时候使用
+      const keys=[...this.$refs.treeRef.getCheckedKeys(),...this.$refs.treeRef.getHalfCheckedKeys()]
+      // 将数组转化成字符串
+      const idStr=keys.join(",")
+      this.$http.post(`roles/${this.roleId}/rights`,{rids:idStr}).then(res => {
+        console.log(res.data)
+        if(res.data.meta.status!==200){
+         return this.$message.error("分配权限失败")
+        }
+        this.$message.success("分配权限成功")
+        // 成功后重新获取权限列表
+        this.getRolesList()
+        // 关闭弹窗
+        this.dialogVisible=false
       })
     }
   }

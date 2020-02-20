@@ -17,11 +17,17 @@
             clearable
             @clear="getUserList"
           >
-            <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
+            <el-button
+              slot="append"
+              icon="el-icon-search"
+              @click="getUserList"
+            ></el-button>
           </el-input>
         </el-col>
         <el-col :span="6">
-          <el-button type="primary" @click="dialogVisible = true">添加用户</el-button>
+          <el-button type="primary" @click="dialogVisible = true"
+            >添加用户</el-button
+          >
         </el-col>
       </el-row>
       <el-table :data="userList" stripe border style="width: 100%">
@@ -33,15 +39,33 @@
         <el-table-column label="状态">
           <template slot-scope="scope">
             <!-- {{scope.row}}作用域插槽 获取当前行的所有参数 -->
-            <el-switch v-model="scope.row.mg_state" @change="changeStata(scope.row)"></el-switch>
+            <el-switch
+              v-model="scope.row.mg_state"
+              @change="changeStata(scope.row)"
+            ></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="190px">
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" size="mini" @click='alterUser(scope.row.id)'></el-button>
-            <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeUser(scope.row.id)"></el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="alterUser(scope.row.id)"
+            ></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="removeUser(scope.row.id)"
+            ></el-button>
             <el-tooltip content="角色分配" placement="top">
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+              <el-button
+                type="warning"
+                icon="el-icon-setting"
+                size="mini"
+                @click="setRole(scope.row)"
+              ></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -57,7 +81,12 @@
       ></el-pagination>
     </el-card>
     <!--添加用户 弹出框 -->
-    <el-dialog title="添加用户" :visible.sync="dialogVisible" width="50%" @close="addUserClose">
+    <el-dialog
+      title="添加用户"
+      :visible.sync="dialogVisible"
+      width="50%"
+      @close="addUserClose"
+    >
       <el-form
         :model="ruleForm"
         :rules="addUserRules"
@@ -84,7 +113,12 @@
       </span>
     </el-dialog>
     <!-- 修改用户的弹出框 -->
-    <el-dialog title="修改用户" :visible.sync="alterDialogVisible" width="50%" @close="alterClose" >
+    <el-dialog
+      title="修改用户"
+      :visible.sync="alterDialogVisible"
+      width="50%"
+      @close="alterClose"
+    >
       <el-form
         :model="alterUserFrom"
         :rules="addUserRules"
@@ -93,9 +127,12 @@
         class="demo-ruleForm"
       >
         <el-form-item label="用户名">
-          <el-input v-model="alterUserFrom.username" :disabled="true"></el-input>
+          <el-input
+            v-model="alterUserFrom.username"
+            :disabled="true"
+          ></el-input>
         </el-form-item>
-        
+
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="alterUserFrom.email"></el-input>
         </el-form-item>
@@ -106,6 +143,31 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="alterDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="alterUserInfo">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 角色分配的弹窗 -->
+
+    <el-dialog
+      title="提示"
+      :visible.sync="roleDialogVisible"
+      width="50%"
+      @close="setRolesClose"
+    >
+      <div>
+        <p>当前的用户：{{ userInfo.username }}</p>
+        <p>当前的角色：{{ userInfo.role_name }}</p>
+        分配角色
+        <el-select v-model="selectRole" placeholder="请选择">
+          <el-option
+            v-for="item in rolesList"
+            :key="item.id"
+            :label="item.roleName"
+            :value="item.id"
+          >
+          </el-option>
+        </el-select>
+        <el-button @click="roleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveUserInfo">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -145,13 +207,13 @@ export default {
 
       //控制添加用户弹出框的出现隐藏
       dialogVisible: false,
-     //   控制修改用户的弹出框的出现于隐藏
-        alterDialogVisible:false,
+      //   控制修改用户的弹出框的出现于隐藏
+      alterDialogVisible: false,
       // 表单验证规则
       addUserRules: {
         name: [
           { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 3, max: 10, message: "长度在 3 到 10 个字符", trigger: "blur" },
+          { min: 3, max: 10, message: "长度在 3 到 10 个字符", trigger: "blur" }
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
@@ -173,8 +235,16 @@ export default {
         email: "",
         mobile: ""
       },
-    //   修改用户的双向绑定对象
-    alterUserFrom:{}
+      //   修改用户的双向绑定对象
+      alterUserFrom: {},
+      // 控制分配角色弹窗的显示隐藏
+      roleDialogVisible: false,
+      // 保存当前角色信息
+      userInfo: {},
+      // 所有角色列表
+      rolesList: [],
+      // 分配角色下拉框的双向绑定
+      selectRole: ""
     };
   },
   created() {
@@ -257,75 +327,110 @@ export default {
       });
     },
     // 点击修改用户的按钮的事件
-    alterUser(id){
-        console.log(id)
-        this.$http.get('users/'+id).then(res =>{
-            console.log(res.data);
-            if(res.data.meta.status !==200){
-                return this.$message.error('获取用户信息失败');
-            }
-            this.alterUserFrom=res.data.data;
-            console.log(this.alterUserFrom);
-        })
-        this.alterDialogVisible=true
+    alterUser(id) {
+      console.log(id);
+      this.$http.get("users/" + id).then(res => {
+        console.log(res.data);
+        if (res.data.meta.status !== 200) {
+          return this.$message.error("获取用户信息失败");
+        }
+        this.alterUserFrom = res.data.data;
+        console.log(this.alterUserFrom);
+      });
+      this.alterDialogVisible = true;
     },
     // 修改用户的弹出框的关闭事件
-    alterClose(){
-        // 弹框关闭的时候重置整个表单
-        this.$refs.alterRuleFormRef.resetFields()
+    alterClose() {
+      // 弹框关闭的时候重置整个表单
+      this.$refs.alterRuleFormRef.resetFields();
     },
     // 修改用户的弹框点击确定按钮的事件
-    alterUserInfo(){
-         this.$refs.alterRuleFormRef.validate(valid => {
-            //  首先对表单进行欲验证
-             if(!valid){
-                 return
-             }
-            //  验证通过发起请求
-            this.$http.put('users/' + this.alterUserFrom.id,{
-                email:this.alterUserFrom.email,
-                mobile:this.alterUserFrom.mobile
-            }).then(res => {
-                console.log(res)
-                if(!res.data.meta.status==200){
-                    return this.$message.error('修改用户信息失败')
-                }else{
-                    this.alterDialogVisible=false;
-                    this.getUserList();
-                    this.$message.success('修改成功')
-                }
-            })
-
-         })
+    alterUserInfo() {
+      this.$refs.alterRuleFormRef.validate(valid => {
+        //  首先对表单进行欲验证
+        if (!valid) {
+          return;
+        }
+        //  验证通过发起请求
+        this.$http
+          .put("users/" + this.alterUserFrom.id, {
+            email: this.alterUserFrom.email,
+            mobile: this.alterUserFrom.mobile
+          })
+          .then(res => {
+            console.log(res);
+            if (!res.data.meta.status == 200) {
+              return this.$message.error("修改用户信息失败");
+            } else {
+              this.alterDialogVisible = false;
+              this.getUserList();
+              this.$message.success("修改成功");
+            }
+          });
+      });
     },
     // 点击删除按钮的事件
-    removeUser(id){
-        // 出现操作确认弹窗，点击确认会进入then，点击取消会进入catch
-          this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-            console.log('点击了确认按钮')
-            this.$http.delete('users/' + id).then((res) => {
-                console.log(res.data)
-                if(res.data.meta.status!==200){
-                    return this.$message.error('删除用户失败')
-                }else{
-                    this.$message.success("删除用户成功")
-                    this.getUserList()
-                }
-
-            })
-
-        }).catch(()=>{
-            this.$message.info('取消了删除操作')
-            
+    removeUser(id) {
+      // 出现操作确认弹窗，点击确认会进入then，点击取消会进入catch
+      this.$confirm("此操作将永久删除该用户, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          console.log("点击了确认按钮");
+          this.$http.delete("users/" + id).then(res => {
+            console.log(res.data);
+            if (res.data.meta.status !== 200) {
+              return this.$message.error("删除用户失败");
+            } else {
+              this.$message.success("删除用户成功");
+              this.getUserList();
+            }
+          });
         })
+        .catch(() => {
+          this.$message.info("取消了删除操作");
+        });
+    },
+    // 点击分配角色按钮
+    setRole(userInfo) {
+      // 把当前点击的角色的信息保存
+      this.userInfo = userInfo;
+      this.roleDialogVisible = true;
+      // 获取当前所有角色列表
+      this.$http.get("roles").then(res => {
+        console.log(res.data);
+        if (res.data.meta.status !== 200) {
+          return this.$message.error("获取角色列表失败");
+        }
+        this.rolesList = res.data.data;
+      });
+    },
+    // 分配角色弹框的确认按钮事件
+    saveUserInfo() {
+      // 判断用户是否选择了新的角色
+      if (!this.selectRole) {
+        return this.$message.error("请选择新的角色");
+      }
+      // 发起对应的请求
+      this.$http.put(`users/${this.userInfo.id}/role`).then(res => {
+        console.log(res);
+        if (res.data.meta.status !== 200) {
+          return this.$message.error("分配角色失败");
+        }
+        this.getUserList();
+        this.roleDialogVisible = false;
+      });
+    },
+    // 分配权限弹框的关闭事件
+    setRolesClose(){
+      // 对话框关闭的时候重置输入框以及userInfo
+      this.selectRole=''
+      this.userInfo={}
     }
   }
-}
+};
 </script>
 
-<style>
-</style>
+<style></style>
