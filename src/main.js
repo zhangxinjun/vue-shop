@@ -3,7 +3,11 @@ import App from './App.vue'
 import router from './router'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-// 导入全局样式表
+// 引入外部表格插件
+import TreeTable from 'vue-table-with-tree-grid';
+// 全局注册表格插件
+Vue.component('tree-table', TreeTable)
+    // 导入全局样式表
 import "./assets/css/global.css"
 // 导入字体图标
 import "./assets/font_389se3aq2p6/iconfont.css"

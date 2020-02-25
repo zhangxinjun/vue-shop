@@ -168,7 +168,7 @@
         </el-select>
         <el-button @click="roleDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveUserInfo">确 定</el-button>
-      </span>
+      </div>
     </el-dialog>
   </div>
 </template>
