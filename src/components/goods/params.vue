@@ -36,7 +36,25 @@
             <!-- 展开行 -->
             <el-table-column type="expand">
               <template slot-scope="scope">
-                <el-tag  closable v-for="(item,index) in scope.row.attr_vals" :key="index">{{item}}</el-tag>
+                <el-tag closable v-for="(item,index) in scope.row.attr_vals" :key="index" 
+                @close="handerClose(index,scope.row)"
+                >{{item}}</el-tag>
+                <!-- tag与input的切换 -->
+                <el-input
+                  class="input-new-tag"
+                  v-if="scope.row.inputVisible"
+                  v-model="scope.row.inputValue"
+                  ref="saveTagInput"
+                  size="small"
+                  @keyup.enter.native="handleInputConfirm(scope.row)"
+                  @blur="handleInputConfirm(scope.row)"
+                ></el-input>
+                <el-button
+                  v-else
+                  class="button-new-tag"
+                  size="small"
+                  @click="showInput(scope.row)"
+                >+ New Tag</el-button>
               </template>
             </el-table-column>
             <!-- 索引列 -->
@@ -72,7 +90,29 @@
             <!-- 展开行 -->
             <el-table-column type="expand">
               <template slot-scope="scope">
-                <el-tag  closable v-for="(item,index) in scope.row.attr_vals" :key="index">{{item}}</el-tag>
+                <!-- 循环已有的tag -->
+                <el-tag
+                  closable
+                  v-for="(item,index) in scope.row.attr_vals"
+                  :key="index"
+                  @close="handerClose(index,scope.row)"
+                >{{item}}</el-tag>
+                <!-- tag与input的切换 -->
+                <el-input
+                  class="input-new-tag"
+                  v-if="scope.row.inputVisible"
+                  v-model="scope.row.inputValue"
+                  ref="saveTagInput"
+                  size="small"
+                  @keyup.enter.native="handleInputConfirm(scope.row)"
+                  @blur="handleInputConfirm(scope.row)"
+                ></el-input>
+                <el-button
+                  v-else
+                  class="button-new-tag"
+                  size="small"
+                  @click="showInput(scope.row)"
+                >+ New Tag</el-button>
               </template>
             </el-table-column>
             <!-- 索引列 -->
@@ -229,6 +269,9 @@ export default {
       if (this.selectParentKey.length !== 3) {
         // 将双向绑定的数组重置
         this.selectParentKey = [];
+        // 将动态和静态参数的列表清空
+        this.manyTableList=[];
+        this.onlyTableList=[]
         return;
       }
       // 发起请求获取当前的分类列表
@@ -246,7 +289,11 @@ export default {
       // 对结果进行判断赋值之前首先对attr_vals进行处理，有字符串转换为数组以备后续tag标签使用
       res.data.forEach(item => {
         // 循环的时候判断一下该属性是否为空
-        item.attr_vals = item.attr_vals ? item.attr_vals.split(" ") : [] ;
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(" ") : [];
+        // 添加属性控制当前的input与tag的切换显示
+        (item.inputVisible = false),
+          //  单独的数据绑定
+          (item.inputValue = "");
       });
       console.log(res.data);
 
@@ -357,6 +404,52 @@ export default {
             message: "已取消删除"
           });
         });
+    },
+    // input框的失去焦点和点击回车都会出发的事件
+    async handleInputConfirm(row) {
+      // 首先验证用户输入的有效性，如果用户输入的都是空格就说明是无效的
+      if (row.inputValue.trim().length == 0) {
+        row.inputValue = "";
+        row.inputVisible = false;
+        return;
+      }
+      // 没有return说明用户的输入时有效的，就把用户的输入push到数组中，同时去除用户输入的首尾的空格
+      row.attr_vals.push(row.inputValue.trim());
+      row.inputValue = "";
+      row.inputVisible = false;
+      // 发起请求吧用户输入的内容添加到服务器中
+      this.saveAttrVals(row)
+    },
+    // 添加tag的点击事件
+    showInput(item) {
+      // 将点击的那个的属性变成true显示input框
+      item.inputVisible = true;
+      // 在元素重新渲染完成后执行的事件
+      this.$nextTick(_ => {
+        //  输入框出现的时候自动获取焦点
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
+    },
+    // 删除tag可选参数的操作
+    handerClose(index, row) {
+      // 将前端数组中的该项删除
+      row.attr_vals.splice(index, 1);
+      this.saveAttrVals(row)
+    },
+    // 对tag参数的操作单独提取出来以备添加和删除的时候的调用
+    async saveAttrVals(row) {
+      const { data: res } = await this.$http.put(
+        `categories/${this.isCaterId}/attributes/${row.attr_id}`,
+        {
+          attr_name: row.attr_name,
+          attr_sel: row.attr_sel,
+          attr_vals: row.attr_vals.join(" ")
+        }
+      );
+      if (res.meta.status !== 200) {
+        return this.$message.error("修改参数失败");
+      }
+      this.$message.success("修改参数成功");
     }
   },
   // 计算属性
@@ -394,7 +487,10 @@ export default {
 .cascader {
   margin-top: 50px;
 }
-.el-tag{
-  margin: 10px
+.el-tag {
+  margin: 10px;
+}
+.input-new-tag {
+  width: 120px;
 }
 </style>
