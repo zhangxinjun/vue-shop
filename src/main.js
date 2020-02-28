@@ -5,9 +5,8 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 // 引入外部表格插件
 import TreeTable from 'vue-table-with-tree-grid';
-// 全局注册表格插件
-Vue.component('tree-table', TreeTable)
-    // 导入全局样式表
+
+// 导入全局样式表
 import "./assets/css/global.css"
 // 导入字体图标
 import "./assets/font_389se3aq2p6/iconfont.css"
@@ -23,9 +22,24 @@ axios.interceptors.request.use(config => {
     })
     // 将axios注册给vue全局
 Vue.prototype.$http = axios
-
 Vue.config.productionTip = false
+
+// 全局注册表格插件
+Vue.component('tree-table', TreeTable)
 Vue.use(ElementUI);
+// 添加全局的时间过滤器
+Vue.filter('dateFormat', function(origin) {
+    const dt = new Date(origin)
+    const year = dt.getFullYear()
+        // 将得到的时间转化成字符串，长度不够两位的通过padStart方法在前面补全
+    const mon = (dt.getMonth() + 1 + '').padStart(2, '0')
+    const day = (dt.getDay() + '').padStart(2, "0")
+    const hour = (dt.getHours() + '').padStart(2, "0")
+    const min = (dt.getMinutes() + '').padStart(2, "0")
+    const sec = (dt.getSeconds() + '').padStart(2, "0")
+    return `${year}-${mon}-${day}-${hour}:${min}:${sec}`
+})
+
 new Vue({
     router,
     render: h => h(App)
