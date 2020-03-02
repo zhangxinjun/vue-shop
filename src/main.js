@@ -10,6 +10,12 @@ import TreeTable from 'vue-table-with-tree-grid';
 import "./assets/css/global.css"
 // 导入字体图标
 import "./assets/font_389se3aq2p6/iconfont.css"
+// 引入富文本编辑器 https://github.com/surmon-china/vue-quill-editor
+import VueQuillEditor from 'vue-quill-editor'
+// require styles 富文本编辑器的样式
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 import axios from 'axios'
 // 设置公用的请求头
 axios.defaults.baseURL = 'https://www.liulongbin.top:8888/api/private/v1/'
@@ -27,7 +33,9 @@ Vue.config.productionTip = false
 // 全局注册表格插件
 Vue.component('tree-table', TreeTable)
 Vue.use(ElementUI);
-// 添加全局的时间过滤器
+// 全局注册富文本组件
+Vue.use(VueQuillEditor)
+    // 添加全局的时间过滤器
 Vue.filter('dateFormat', function(origin) {
     const dt = new Date(origin)
     const year = dt.getFullYear()
