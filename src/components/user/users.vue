@@ -10,164 +10,157 @@
     <el-card class="box-card">
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input
-            placeholder="请输入内容"
-            class="input-with-select"
-            v-model="queryInfo.query"
-            clearable
-            @clear="getUserList"
-          >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="getUserList"
-            ></el-button>
+          <el-input placeholder="请输入内容"
+                    class="input-with-select"
+                    v-model="queryInfo.query"
+                    clearable
+                    @clear="getUserList">
+            <el-button slot="append"
+                       icon="el-icon-search"
+                       @click="getUserList"></el-button>
           </el-input>
         </el-col>
         <el-col :span="6">
-          <el-button type="primary" @click="dialogVisible = true"
-            >添加用户</el-button
-          >
+          <el-button type="primary"
+                     @click="dialogVisible = true">添加用户</el-button>
         </el-col>
       </el-row>
-      <el-table :data="userList" stripe border style="width: 100%">
+      <el-table :data="userList"
+                stripe
+                border
+                style="width: 100%">
         <el-table-column type="index"></el-table-column>
-        <el-table-column prop="username" label="姓名"></el-table-column>
-        <el-table-column prop="email" label="邮箱"></el-table-column>
-        <el-table-column prop="mobile" label="电话"></el-table-column>
-        <el-table-column prop="role_name" label="角色"></el-table-column>
+        <el-table-column prop="username"
+                         label="姓名"></el-table-column>
+        <el-table-column prop="email"
+                         label="邮箱"></el-table-column>
+        <el-table-column prop="mobile"
+                         label="电话"></el-table-column>
+        <el-table-column prop="role_name"
+                         label="角色"></el-table-column>
         <el-table-column label="状态">
           <template slot-scope="scope">
             <!-- {{scope.row}}作用域插槽 获取当前行的所有参数 -->
-            <el-switch
-              v-model="scope.row.mg_state"
-              @change="changeStata(scope.row)"
-            ></el-switch>
+            <el-switch v-model="scope.row.mg_state"
+                       @change="changeStata(scope.row)"></el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="190px">
+        <el-table-column label="操作"
+                         width="190px">
           <template slot-scope="scope">
-            <el-button
-              type="primary"
-              icon="el-icon-edit"
-              size="mini"
-              @click="alterUser(scope.row.id)"
-            ></el-button>
-            <el-button
-              type="danger"
-              icon="el-icon-delete"
-              size="mini"
-              @click="removeUser(scope.row.id)"
-            ></el-button>
-            <el-tooltip content="角色分配" placement="top">
-              <el-button
-                type="warning"
-                icon="el-icon-setting"
-                size="mini"
-                @click="setRole(scope.row)"
-              ></el-button>
+            <el-button type="primary"
+                       icon="el-icon-edit"
+                       size="mini"
+                       @click="alterUser(scope.row.id)"></el-button>
+            <el-button type="danger"
+                       icon="el-icon-delete"
+                       size="mini"
+                       @click="removeUser(scope.row.id)"></el-button>
+            <el-tooltip content="角色分配"
+                        placement="top">
+              <el-button type="warning"
+                         icon="el-icon-setting"
+                         size="mini"
+                         @click="setRole(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="queryInfo.pagenum"
-        :page-sizes="[1, 2, 5, 10]"
-        :page-size="queryInfo.pagesize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-      ></el-pagination>
+      <el-pagination @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :current-page="queryInfo.pagenum"
+                     :page-sizes="[1, 2, 5, 10]"
+                     :page-size="queryInfo.pagesize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total"></el-pagination>
     </el-card>
     <!--添加用户 弹出框 -->
-    <el-dialog
-      title="添加用户"
-      :visible.sync="dialogVisible"
-      width="50%"
-      @close="addUserClose"
-    >
-      <el-form
-        :model="ruleForm"
-        :rules="addUserRules"
-        ref="ruleForm"
-        label-width="70px"
-        class="demo-ruleForm"
-      >
-        <el-form-item label="用户名" prop="name">
+    <el-dialog title="添加用户"
+               :visible.sync="dialogVisible"
+               width="50%"
+               @close="addUserClose">
+      <el-form :model="ruleForm"
+               :rules="addUserRules"
+               ref="ruleForm"
+               label-width="70px"
+               class="demo-ruleForm">
+        <el-form-item label="用户名"
+                      prop="name">
           <el-input v-model="ruleForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="ruleForm.password" type="password"></el-input>
+        <el-form-item label="密码"
+                      prop="password">
+          <el-input v-model="ruleForm.password"
+                    type="password"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item label="邮箱"
+                      prop="email">
           <el-input v-model="ruleForm.email"></el-input>
         </el-form-item>
-        <el-form-item label="手机号" prop="mobile">
+        <el-form-item label="手机号"
+                      prop="mobile">
           <el-input v-model="ruleForm.mobile"></el-input>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer"
+            class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addUser">确 定</el-button>
+        <el-button type="primary"
+                   @click="addUser">确 定</el-button>
       </span>
     </el-dialog>
     <!-- 修改用户的弹出框 -->
-    <el-dialog
-      title="修改用户"
-      :visible.sync="alterDialogVisible"
-      width="50%"
-      @close="alterClose"
-    >
-      <el-form
-        :model="alterUserFrom"
-        :rules="addUserRules"
-        ref="alterRuleFormRef"
-        label-width="70px"
-        class="demo-ruleForm"
-      >
+    <el-dialog title="修改用户"
+               :visible.sync="alterDialogVisible"
+               width="50%"
+               @close="alterClose">
+      <el-form :model="alterUserFrom"
+               :rules="addUserRules"
+               ref="alterRuleFormRef"
+               label-width="70px"
+               class="demo-ruleForm">
         <el-form-item label="用户名">
-          <el-input
-            v-model="alterUserFrom.username"
-            :disabled="true"
-          ></el-input>
+          <el-input v-model="alterUserFrom.username"
+                    :disabled="true"></el-input>
         </el-form-item>
 
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item label="邮箱"
+                      prop="email">
           <el-input v-model="alterUserFrom.email"></el-input>
         </el-form-item>
-        <el-form-item label="手机号" prop="mobile">
+        <el-form-item label="手机号"
+                      prop="mobile">
           <el-input v-model="alterUserFrom.mobile"></el-input>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer"
+            class="dialog-footer">
         <el-button @click="alterDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="alterUserInfo">确 定</el-button>
+        <el-button type="primary"
+                   @click="alterUserInfo">确 定</el-button>
       </span>
     </el-dialog>
     <!-- 角色分配的弹窗 -->
 
-    <el-dialog
-      title="提示"
-      :visible.sync="roleDialogVisible"
-      width="50%"
-      @close="setRolesClose"
-    >
+    <el-dialog title="提示"
+               :visible.sync="roleDialogVisible"
+               width="50%"
+               @close="setRolesClose">
       <div>
         <p>当前的用户：{{ userInfo.username }}</p>
         <p>当前的角色：{{ userInfo.role_name }}</p>
         分配角色
-        <el-select v-model="selectRole" placeholder="请选择">
-          <el-option
-            v-for="item in rolesList"
-            :key="item.id"
-            :label="item.roleName"
-            :value="item.id"
-          >
+        <el-select v-model="selectRole"
+                   placeholder="请选择">
+          <el-option v-for="item in rolesList"
+                     :key="item.id"
+                     :label="item.roleName"
+                     :value="item.id">
           </el-option>
         </el-select>
         <el-button @click="roleDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveUserInfo">确 定</el-button>
+        <el-button type="primary"
+                   @click="saveUserInfo">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -175,7 +168,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     // 邮箱的自定义验证
     var checkEmail = (rule, value, callback) => {
       const regEmail = /^[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*\.[a-z]{2,}$/;
@@ -247,11 +240,11 @@ export default {
       selectRole: ""
     };
   },
-  created() {
+  created () {
     this.getUserList();
   },
   methods: {
-    getUserList() {
+    getUserList () {
       this.$http
         .get("users", {
           params: this.queryInfo
@@ -266,21 +259,21 @@ export default {
         });
     },
     // 每页条数改变
-    handleSizeChange(newSize) {
+    handleSizeChange (newSize) {
       console.log(newSize);
       this.queryInfo.pagesize = newSize;
       this.getUserList();
     },
 
     // 第几页改变
-    handleCurrentChange(newPage) {
+    handleCurrentChange (newPage) {
       console.log(newPage);
 
       this.queryInfo.pagenum = newPage;
       this.getUserList();
     },
     // 状态栏的状态发生改变的时候
-    changeStata(newState) {
+    changeStata (newState) {
       console.log(newState);
       this.$http
         .put(`users/${newState.id}/state/${newState.mg_state}`)
@@ -294,12 +287,28 @@ export default {
         });
     },
     // 弹出框的关闭事件
-    addUserClose() {
+    addUserClose () {
       // 弹出框关闭的时候重置表单
       this.$refs.ruleForm.resetFields();
     },
     // 点击确定按钮时添加用户
-    addUser() {
+    addUser () {
+      let flage = false // 
+      this.$refs.ruleForm.validateField(['name', 'password'], error => {
+        if (error) {
+          flage = false
+        } else {
+          flage = true
+        }
+      })
+      if (flage) {
+        // 对部分表单校验全部通过
+      } else {
+        // 对部分表单校验没有通过
+      }
+      console.log('fla', flage);
+
+      return
       //    首先对表单进行预先验证，验证成功后发起请求
       this.$refs.ruleForm.validate(valida => {
         // console.log(valida)
@@ -327,7 +336,7 @@ export default {
       });
     },
     // 点击修改用户的按钮的事件
-    alterUser(id) {
+    alterUser (id) {
       console.log(id);
       this.$http.get("users/" + id).then(res => {
         console.log(res.data);
@@ -340,12 +349,12 @@ export default {
       this.alterDialogVisible = true;
     },
     // 修改用户的弹出框的关闭事件
-    alterClose() {
+    alterClose () {
       // 弹框关闭的时候重置整个表单
       this.$refs.alterRuleFormRef.resetFields();
     },
     // 修改用户的弹框点击确定按钮的事件
-    alterUserInfo() {
+    alterUserInfo () {
       this.$refs.alterRuleFormRef.validate(valid => {
         //  首先对表单进行欲验证
         if (!valid) {
@@ -370,7 +379,7 @@ export default {
       });
     },
     // 点击删除按钮的事件
-    removeUser(id) {
+    removeUser (id) {
       // 出现操作确认弹窗，点击确认会进入then，点击取消会进入catch
       this.$confirm("此操作将永久删除该用户, 是否继续?", "提示", {
         confirmButtonText: "确定",
@@ -394,7 +403,7 @@ export default {
         });
     },
     // 点击分配角色按钮
-    setRole(userInfo) {
+    setRole (userInfo) {
       // 把当前点击的角色的信息保存
       this.userInfo = userInfo;
       this.roleDialogVisible = true;
@@ -408,7 +417,7 @@ export default {
       });
     },
     // 分配角色弹框的确认按钮事件
-    saveUserInfo() {
+    saveUserInfo () {
       // 判断用户是否选择了新的角色
       if (!this.selectRole) {
         return this.$message.error("请选择新的角色");
@@ -424,10 +433,10 @@ export default {
       });
     },
     // 分配权限弹框的关闭事件
-    setRolesClose(){
+    setRolesClose () {
       // 对话框关闭的时候重置输入框以及userInfo
-      this.selectRole=''
-      this.userInfo={}
+      this.selectRole = ''
+      this.userInfo = {}
     }
   }
 };
