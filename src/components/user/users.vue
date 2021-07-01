@@ -249,14 +249,18 @@ export default {
     getUserList () {
       axios.get("users", {
         params: this.queryInfo
-      }, { cancelRequest: true })
+      })
         .then(res => {
           if (res.data.meta.status !== 200) {
             this.$message.error("获取用户列表失败");
           }
           this.userList = res.data.data.users;
           this.total = res.data.data.total;
-        });
+        })
+        .catch(err => {
+          console.log('err', err);
+
+        })
     },
     // 每页条数改变
     handleSizeChange (newSize) {
