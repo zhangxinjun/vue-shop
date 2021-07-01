@@ -167,6 +167,7 @@
 </template>
 
 <script>
+import axios from '../../until/request.js'
 export default {
   data () {
     // 邮箱的自定义验证
@@ -242,15 +243,14 @@ export default {
   },
   created () {
     this.getUserList();
+    this.getUserList()
   },
   methods: {
     getUserList () {
-      this.$http
-        .get("users", {
-          params: this.queryInfo
-        })
+      axios.get("users", {
+        params: this.queryInfo
+      }, { cancelRequest: true })
         .then(res => {
-          console.log(res.data.data);
           if (res.data.meta.status !== 200) {
             this.$message.error("获取用户列表失败");
           }
